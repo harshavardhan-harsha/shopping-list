@@ -5,7 +5,7 @@ class App extends Component {
   state = {
     items: [],
     message: "",
-    editItem: "",
+    displayItem: "",
     edit: false,
     current: null
   };
@@ -13,51 +13,54 @@ class App extends Component {
   handleSubmit = e => {
     e.preventDefault();
     if (this.state.edit) {
-      const items = this.state.items.map((item, i) => (i === this.state.current ? this.state.editItem : item));
-      this.setState({ items: items, current: null, edit: false, editItem: "" });
+      const items = this.state.items.map((item, i) => (i === this.state.current ? this.state.displayItem : item));
+      this.setState({ items: items, current: null, edit: false, displayItem: "" });
     } else {
       const newItem = this.refs.item.value;
       const isThere = this.state.items.includes(newItem);
       if (isThere) {
         this.setState({ message: "Item is in the list" });
       } else {
-        this.setState({ items: [...this.state.items, newItem], message: "", editItem: "" });
+        this.setState({ items: [...this.state.items, newItem], message: "", displayItem: "" });
       }
     }
   };
 
-  removeItem = deleteitem => {
-    this.setState({ items: this.state.items.filter(item => item !== deleteitem) });
+  removeItem = deleteItemIndex => {
+    this.setState({ items: this.state.items.filter((item, i) => i !== deleteItemIndex) });
   };
 
   clearItems = () => {
-    this.setState({ items: [] });
+    this.setState({ items: [], message: "", edit: false, displayItem: "", current: null });
   };
 
   onChange = e => {
-    this.setState({ editItem: this.refs.item.value });
+    this.setState({ displayItem: this.refs.item.value });
   };
 
   handleEdit = (item, i) => {
-    this.setState({ editItem: item, edit: true, current: i });
+    this.setState({ displayItem: item, edit: true, current: i });
   };
 
   render() {
-    const { items, message, editItem, edit } = this.state;
+    const { items, message, displayItem, edit } = this.state;
     return (
       <div className="container">
-        <h1 align="center">Shopping List</h1>
+        <br />
+        <h1 align="center" className="text-primary">
+          Shopping List
+        </h1>
         <form onSubmit={this.handleSubmit}>
           <div className="form-group">
             <label htmlFor="item">Enter the item</label>
-            <input type="text" ref="item" name="item" value={editItem} onChange={this.onChange} required />
+            <input type="text" ref="item" name="item" value={displayItem} onChange={this.onChange} required />
           </div>
           <input type="submit" value={edit ? "Update Item" : "Add Item"} className="btn btn-primary btn-sm" />
         </form>
         <div>
           {items.length > 0 ? (
             <Fragment>
-              {message !== "" && <p>{message}</p>}
+              {message && <p>{message}</p>}
               <table className="table table-bordered">
                 <thead>
                   <tr>
@@ -78,7 +81,7 @@ class App extends Component {
                         </button>
                       </td>
                       <td>
-                        <button className="btn btn-sm btn-danger" onClick={() => this.removeItem(item)}>
+                        <button className="btn btn-sm btn-danger" onClick={() => this.removeItem(i)}>
                           <i className="fas fa-trash-alt" />
                         </button>
                       </td>
