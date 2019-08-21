@@ -30,6 +30,10 @@ class App extends Component {
     this.setState({ items: this.state.items.filter((item, i) => i !== deleteItemIndex) });
   };
 
+  clearInput = () => {
+    this.setState({ displayItem: "" });
+  };
+
   clearItems = () => {
     this.setState({ items: [], message: "", edit: false, displayItem: "", current: null });
   };
@@ -56,6 +60,7 @@ class App extends Component {
             <input type="text" ref="item" name="item" value={displayItem} onChange={this.onChange} required />
           </div>
           <input type="submit" value={edit ? "Update Item" : "Add Item"} className="btn btn-primary btn-sm" />
+          <input type="button" value="clear" onClick={this.clearInput} className="btn btn-dark btn-sm" />
         </form>
         <div>
           {items.length > 0 ? (
