@@ -1,62 +1,31 @@
 import React, { Component, Fragment } from "react";
 import Item from "./Item";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { addItem, deleteItem, editItem, handleEdit, clearInput, clearItems, handleInput, handleMessage } from "../actions/itemActions";
 
 class Items extends Component {
-  state = {
-    items: [],
-    message: "",
-    displayItem: "",
-    edit: false,
-    current: null
-  };
-
   handleSubmit = e => {
     e.preventDefault();
-    if (this.state.edit) {
-      const items = this.state.items.map((item, i) => (i === this.state.current ? this.state.displayItem : item));
-      this.setState({ items: items, current: null, edit: false, displayItem: "", message: "Item updated" });
-      setTimeout(() => {
-        this.setState({ message: "" });
-      }, 3000);
+    if (this.props.edit) {
+      this.props.editItem();
     } else {
       const newItem = this.refs.item.value;
-      const isThere = this.state.items.includes(newItem);
+      const isThere = this.props.items.includes(newItem);
       if (isThere) {
-        this.setState({ message: "Item is in the list" });
-        setTimeout(() => {
-          this.setState({ message: "" });
-        }, 3000);
+        this.props.handleMessage("Item is in the list");
       } else {
-        this.setState({ items: [...this.state.items, newItem], message: "", displayItem: "" });
+        this.props.addItem(newItem);
       }
     }
   };
 
-  removeItem = deleteItemIndex => {
-    this.setState({ items: this.state.items.filter((item, i) => i !== deleteItemIndex), message: "Item deleted" });
-    setTimeout(() => {
-      this.setState({ message: "" });
-    }, 3000);
-  };
-
-  clearInput = () => {
-    this.setState({ displayItem: "" });
-  };
-
-  clearItems = () => {
-    this.setState({ items: [], message: "", edit: false, displayItem: "", current: null });
-  };
-
   onChange = e => {
-    this.setState({ displayItem: this.refs.item.value });
-  };
-
-  handleEdit = (item, i) => {
-    this.setState({ displayItem: item, edit: true, current: i });
+    this.props.handleInput(this.refs.item.value);
   };
 
   render() {
-    const { items, message, displayItem, edit } = this.state;
+    const { items, message, displayItem, edit, clearInput, handleEdit, deleteItem, clearItems } = this.props;
     return (
       <div className="container">
         <br />
@@ -69,7 +38,7 @@ class Items extends Component {
             <input type="text" ref="item" name="item" value={displayItem} onChange={this.onChange} required />
           </div>
           <input type="submit" value={edit ? "Update Item" : "Add Item"} className="btn btn-primary btn-sm" />
-          <input type="button" value="clear" onClick={this.clearInput} className="btn btn-dark btn-sm" />
+          <input type="button" value="clear" onClick={clearInput} className="btn btn-dark btn-sm" />
         </form>
         <div>
           {items.length > 0 ? (
@@ -86,13 +55,13 @@ class Items extends Component {
                 </thead>
                 <tbody>
                   {items.map((item, i) => (
-                    <Item key={i} item={item} i={i} handleEdit={this.handleEdit} removeItem={this.removeItem} />
+                    <Item key={i} item={item} i={i} handleEdit={handleEdit} deleteItem={deleteItem} />
                   ))}
                 </tbody>
                 <tfoot>
                   <tr>
                     <td colSpan="4">
-                      <button className="btn btn-dark btn-block" onClick={this.clearItems}>
+                      <button className="btn btn-dark btn-block" onClick={clearItems}>
                         Clear Items
                       </button>
                     </td>
@@ -111,4 +80,30 @@ class Items extends Component {
   }
 }
 
-export default Items;
+Items.propTypes = {
+  items: PropTypes.array.isRequired,
+  message: PropTypes.element.isRequired,
+  edit: PropTypes.bool.isRequired,
+  displaItem: PropTypes.element.isRequired,
+  current: PropTypes.element.isRequired,
+
+  addItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  editItem: PropTypes.func.isRequired,
+  handleEdit: PropTypes.func.isRequired,
+  clearItems: PropTypes.func.isRequired,
+  clearInput: PropTypes.func.isRequired,
+  handleInput: PropTypes.func.isRequired,
+  handleMessage: PropTypes.func.isRequired
+};
+const mapStateToProps = state => ({
+  items: state.items,
+  message: state.message,
+  edit: state.edit,
+  displayItem: state.displayItem,
+  current: state.current
+});
+export default connect(
+  mapStateToProps,
+  { addItem, editItem, deleteItem, handleEdit, clearInput, clearItems, handleInput, handleMessage }
+)(Items);

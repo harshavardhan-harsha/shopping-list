@@ -1,6 +1,6 @@
 import React from "react";
 
-const Item = ({ item, i, handleEdit, removeItem }) => {
+const Item = ({ item, i, handleEdit, deleteItem }) => {
   return (
     <tr key={i}>
       <td>{i + 1}</td>
@@ -11,7 +11,7 @@ const Item = ({ item, i, handleEdit, removeItem }) => {
         </button>
       </td>
       <td>
-        <button className="btn btn-sm btn-danger" onClick={() => removeItem(i)}>
+        <button className="btn btn-sm btn-danger" onClick={() => deleteItem(i)}>
           <i className="fas fa-trash-alt" />
         </button>
       </td>
